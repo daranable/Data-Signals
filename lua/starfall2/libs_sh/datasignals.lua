@@ -28,7 +28,8 @@
 -- groups are shared by all players.
 --
 -- @author Daranable
-local data_signal, _ = SF.Libraries.RegisterLocal("data_signal")
+include( "../../datasignals.lua" )
+local data_signal, _ = SF.Libraries.Register("data_signal")
 
 local P = data_signal
 local GP = datasignals
@@ -39,6 +40,7 @@ local CBFunctions = { }
 -- name. If you leave a scope off it defaults to private.
 -- @param group_name a string containing the group name and optionally
 -- scope.
+-- @server
 function P.join( group_name )
 	assert( 
 		type( group_name ) == "string", 
@@ -54,6 +56,7 @@ end
 -- private.
 -- @param group_name a string containing the group name and optionally
 -- scope.
+-- @server
 function P.leave( group_name )
 	assert( 
 		type( group_name ) == "string", 
@@ -68,6 +71,7 @@ end
 -- be called and passed signal name, the value, and the sender.
 -- @param signal name of the signal
 -- @param callback the function that will be called
+-- @server
 function P.listen( signal, callback )
 	assert( 
 		type( signal ) == "string",
@@ -115,6 +119,7 @@ end
 --- Unregisters a function from the given signal name.
 -- @param signal name of the signal
 -- @param callback the function that will be called
+-- @server
 function P.ignore( signal, callback )
 	assert( 
 		type( signal ) == "string",
@@ -138,7 +143,7 @@ local function unwrap_array( array )
 	
 	for key,value in pairs( array ) do
 		if type( value ) == "table" then
-			if getmetatable( value ) == "Entity" then
+			if debug.getmetatable( value ) == SF.Entities.Metatable then
 				value = SF.Entities.Unwrap( value )
 			else
 				value = unwrap_array( value )
@@ -157,8 +162,9 @@ end
 -- @param signal name of the signal
 -- @param data can be any of the following types: Angle, boolean, Entity, 
 -- nil, NPC, number, Player, string, or Vector.
+-- @server
 function P.send( target, signal, data )
-	if getmetatable( target ) == "Entity" then
+	if debug.getmetatable( value ) == SF.Entities.Metatable then
 		target = SF.Entities.Unwrap( target )
 	elseif type( target ) == "table" then
 		target = unwrap_array( target )
@@ -171,7 +177,7 @@ function P.send( target, signal, data )
 		"Data signal name must be a string"
 	)
 	
-	if getmetatable( data ) == "Entity" then
+	if debug.getmetatable( value ) == SF.Entities.Metatable then
 		data = SF.Entities.Unwrap( data )
 	end
 	

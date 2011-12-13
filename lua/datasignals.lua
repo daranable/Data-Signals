@@ -1,3 +1,34 @@
+--- Data signals are a way for wire entities to communicate with 
+-- each other.  This is based off of the library in Expression 2 by the
+-- same name.  The system is interoperable across all wire entities 
+-- including gLua, Expression 2, and Starfall.
+-- 
+-- A data signal is a message with a name and a single value.  A
+-- signal name can be up to twenty characters, made of upper and
+-- lower case letters, digits, and underbar.  The value can be any of
+-- the following types: Angle, boolean, Entity, nil, NPC, number, 
+-- Player, string, or Vector.
+-- 
+-- A function may be assigned to a signal name as a listener.  When a 
+-- signal of that name gets sent to the chip, this function will be
+-- called and passed the signal's name and value. Additionally, 
+-- listeners registerd to the special name '$default' will receive all
+-- signals sent to the chip regardless of name.
+-- 
+-- Wired entities can be organized into groups to simplify delivery to
+-- multiple entities.  A signal sent to a group will be delivered as if
+-- it had been sent to each member of that group individually.  A 
+-- group name is a combination of the group name and a scope identifier.
+-- The scope delimiter is ':'. After this delimiter you can have either 
+-- public or private. If you do not put a scope delimiter and identifer 
+-- it defaults to private.
+-- 
+-- Scope is what sets which entities a group can contain. A private 
+-- group will only contain chips owned by the same player.  Public
+-- groups are shared by all players.
+--
+-- @author Daranable
+
 -- Define global table
 datasignals = { }
 
