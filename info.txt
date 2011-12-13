@@ -1,0 +1,9 @@
+"AddonInfo"
+{
+	"name"        "Data Signals"
+	"version"     "0.1"
+	"author_name" "Daranable"
+	"author_url"  ""
+	"info"        "A data signal generic library for wire."
+	"override"    "0"
+}
