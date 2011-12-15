@@ -37,17 +37,17 @@ local private = { }
 local public = { }
 local listeners = { }
 
-local valid_data = { 
-"string" = true,
-"Angle" = true,
-"Entity" = true,
-"number" = true,
-"Player" = true,
-"Vector" = true,
-"boolean" = true,
-"nil" = true,
-"NPC" = true
-}
+local valid_data = { }
+valid_data["string"] = true
+valid_data["Angle"] = true
+valid_data["Entity"] = true
+valid_data["number"] = true
+valid_data["Player"] = true
+valid_data["Vector"] = true
+valid_data["boolean"] = true
+valid_data["nil"] = true
+valid_data["NPC"] = true
+
 
 --- Retrieves the registration table for a given group.
 -- @param group_name the group name with possible scope

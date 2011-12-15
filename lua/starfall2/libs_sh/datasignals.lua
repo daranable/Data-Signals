@@ -28,7 +28,7 @@
 -- groups are shared by all players.
 --
 -- @author Daranable
-include( "../../datasignals.lua" )
+include( "datasignal.lua" )
 local data_signal, _ = SF.Libraries.Register("data_signal")
 
 local P = data_signal
@@ -164,7 +164,7 @@ end
 -- nil, NPC, number, Player, string, or Vector.
 -- @server
 function P.send( target, signal, data )
-	if debug.getmetatable( value ) == SF.Entities.Metatable then
+	if debug.getmetatable( target ) == SF.Entities.Metatable then
 		target = SF.Entities.Unwrap( target )
 	elseif type( target ) == "table" then
 		target = unwrap_array( target )
@@ -177,9 +177,9 @@ function P.send( target, signal, data )
 		"Data signal name must be a string"
 	)
 	
-	if debug.getmetatable( value ) == SF.Entities.Metatable then
+	if debug.getmetatable( data ) == SF.Entities.Metatable then
 		data = SF.Entities.Unwrap( data )
 	end
 	
-	GP.send( target, signal, data, SF.instance.data.entity )
+	return GP.send( target, signal, data, SF.instance.data.entity )
 end
