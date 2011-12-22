@@ -35,17 +35,27 @@ local P = data_signal
 local GP = datasignals
 local CBFunctions = { }
 
+-- Constants
+-- @constant scope_private
+P.scope_private = 0
+
+-- @constant scope_public
+P.scope_public = 1
+
 --- Joins the named data signal group. To change what scope
 -- you are joing add ':public' or ':private' to the end of the group 
 -- name. If you leave a scope off it defaults to private.
--- @param group_name a string containing the group name and optionally
--- scope.
+-- @param group_name a string containing the group name
+-- @param scope the scope identifier accepts any of the 'scope_'
+-- constants.
 -- @server
-function P.join( group_name )
+function P.join( group_name, scope )
 	assert( 
 		type( group_name ) == "string", 
 		"Data signal group name must be a string" 
 	)
+	
+	if scope == nil then scope = P.scope_private end
 	
 	GP.join( group_name, SF.instance.data.entity )
 end
@@ -54,14 +64,17 @@ end
 -- is a combination of the name and scope, so to leave a public group
 -- you must append the public scope delineator.  Scope defaults to 
 -- private.
--- @param group_name a string containing the group name and optionally
--- scope.
+-- @param group_name a string containing the group name.
+-- @param scope the scope identifier accepts any of the 'scope_'
+-- constants.
 -- @server
-function P.leave( group_name )
+function P.leave( group_name, scope )
 	assert( 
 		type( group_name ) == "string", 
 		"Data signal group name must be a string" 
 	)
+	
+	if scope == nil then scope = P.scope_private end
 	
 	GP.leave( group_name, SF.instance.data.entity )
 end
@@ -159,17 +172,25 @@ end
 --- Sends a data signal.
 -- @param target an entity, a group name, or an array containing any or
 -- all of the possible options.
+-- @param scope the scope you would like to send your message to.
+-- The paramater is optional, if you leave it out, it will default to private scope.
 -- @param signal name of the signal
 -- @param data can be any of the following types: Angle, boolean, Entity, 
 -- nil, NPC, number, Player, string, or Vector.
 -- @server
-function P.send( target, signal, data )
+function P.send( target, scope, signal, data )
 	if debug.getmetatable( target ) == SF.Entities.Metatable then
 		target = SF.Entities.Unwrap( target )
 	elseif type( target ) == "table" then
 		target = unwrap_array( target )
 	elseif type( target ) ~= "string" then 
 		error( "Invalid data signal target" )
+	end
+	
+	if data == nil then 
+		data = signal
+		signal = scope
+		scope = P.scope_private
 	end
 	
 	assert( 

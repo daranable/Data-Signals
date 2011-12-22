@@ -51,19 +51,21 @@ valid_data["NPC"] = true
 
 --- Retrieves the registration table for a given group.
 -- @param group_name the group name with possible scope
+-- @param scope the scope identifier
+-- 0 = private
+-- 1 = public
 -- @param owner the owner or player who owns the chip getting saved
 -- @return the set of members of a given group
-local function getGroupTable( group_name, owner )
-	local name, scope = string.match( group_name, "^([%w_]+)(:%l+)?$" )
+local function getGroupTable( group_name, scope, owner )
+	local name = string.match( group_name, "^([%w_]+)$" )
 	local scope_table
 	local group_table
 	
 	if not name then 
 		error( "Invalid data signal group name '" .. group_name .. "'" ) 
 	end
-	if not scope then scope = ":private" end
 	
-	if scope == ":private" then  
+	if scope == 0 then  
 		scope_table = private[owner]
 		if scope_table == nil then
 			scope_table = { }
@@ -77,7 +79,7 @@ local function getGroupTable( group_name, owner )
 		end
 		
 		return group_table
-	elseif scope == ":public" then
+	elseif scope == 1 then
 		scope_table = public
 		
 		group_table = public[group_name]
@@ -88,7 +90,7 @@ local function getGroupTable( group_name, owner )
 		
 		return group_table
 	else
-		error( "Invalid data signal scope name '" .. scope .. "'" )
+		error( "Invalid data signal scope '" .. scope .. "'" )
 	end
 end
 
@@ -96,8 +98,7 @@ end
 -- @param signal the name of the signal
 -- @return true if it is valid false if it is not
 local function validSignal( signal )
-	if string.match( signal, "^[%w_]+$" ) 
-			and string.len(signal) <= 20 then
+	if string.match( signal, "^[%w_]+$" ) then
 		return true
 	else
 		return false
@@ -107,11 +108,11 @@ end
 --- Adds the chip to the specified group.
 -- @param group_name the group name with possible scope
 -- @param chip the entity of the chip getting added
-function p.join( group_name, chip )
+function p.join( group_name, scope, chip )
 	if type( chip ) ~= "Entity" or not chip:IsValid() then
 		error( "Chip registered with data signal must be a valid entity" )
 	end
-	local group_table = getGroupTable( group_name, chip:GetOwner() )
+	local group_table = getGroupTable( group_name, scope, chip:GetOwner() )
 	
 	group_table[chip] = true
 end
@@ -178,7 +179,7 @@ function p.ignore( signal, chip, callback )
 end
 
 
-local function send( target, signal, data, sender )
+local function send( target, signal, scope, data, sender )
 	local errors = 0
 	if type( target ) == "Entity" then
 		local current = listeners[target]
@@ -192,15 +193,15 @@ local function send( target, signal, data, sender )
 		end
 		
 	elseif type( target ) == "string" then
-		local group_table = getGroupTable( target, sender:GetOwner() )
+		local group_table = getGroupTable( target, scope, sender:GetOwner() )
 		
 		for chip,_ in pairs( group_table ) do
-			errors = errors + send( chip, signal, data, sender )
+			errors = errors + send( chip, signal, scope, data, sender )
 		end
 		
 	elseif type( target ) == "table" then
 		for _,value in pairs( target ) do
-			errors = errors + send( value, signal, data, sender )
+			errors = errors + send( value, signal, scope, data, sender )
 		end
 	end
 	
@@ -212,7 +213,7 @@ end
 -- @param signal name of the signal
 -- @param data the data to be sent, can be any of the valid data types
 -- @param sender the entity of the chip sending this signal
-function p.send( target, signal, data, sender )
+function p.send( target, signal, scope, data, sender )
 	if not validSignal( signal ) then
 		error( "Invalid data signal name '" .. signal .. "'" ) 
 	end
@@ -225,5 +226,5 @@ function p.send( target, signal, data, sender )
 		error( "Sender of data signal must be a valid entity" )
 	end
 	
-	return send( target, signal, data, sender )
+	return send( target, signal, scope, data, sender )
 end
