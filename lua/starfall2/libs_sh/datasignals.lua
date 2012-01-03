@@ -202,5 +202,5 @@ function P.send( target, scope, signal, data )
 		data = SF.Entities.Unwrap( data )
 	end
 	
-	return GP.send( target, signal, data, SF.instance.data.entity )
+	return GP.send( target, scope, signal, data, SF.instance.data.entity )
 end
